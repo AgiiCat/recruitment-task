@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
     res.send('Test')
 })
 app.use("/register", require('./routes/register'))
+app.use("/login", require('./routes/login'))
 
 app.listen(port, () => console.log(`Server is listening on ${port}`))
 
