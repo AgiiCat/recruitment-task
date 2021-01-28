@@ -20,6 +20,10 @@ app.get('/', (req, res) => {
 app.use("/register", require('./routes/register'))
 app.use("/login", require('./routes/login'))
 app.use("/films", require('./routes/films'))
+app.use("/species", require('./routes/species'))
+app.use("/vehicles", require('./routes/vehicles'))
+app.use("/starships", require('./routes/starships'))
+app.use("/planets", require('./routes/planets'))
 
 app.listen(port, () => console.log(`Server is listening on ${port}`))
 

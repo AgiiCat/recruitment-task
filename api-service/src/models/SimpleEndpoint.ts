@@ -4,10 +4,12 @@ import request from "request";
 export default class SimpleEndpoint {
     private connection: Connection
     private readonly itemName: string
+    private readonly jsonItemName: string
 
-    constructor(connection: Connection, itemName: string) {
+    constructor(connection: Connection, itemName: string, jsonItemName?: string) {
         this.connection = connection
         this.itemName = itemName
+        this.jsonItemName = jsonItemName?jsonItemName:itemName
     }
 
     public getAll(email: string, req, res) {
@@ -95,10 +97,10 @@ export default class SimpleEndpoint {
                     reject(err)
                 }
                 const data = JSON.parse(body)
-                if (Array.isArray(data[this.itemName]))
-                    resolve(data[this.itemName])
+                if (Array.isArray(data[this.jsonItemName]))
+                    resolve(data[this.jsonItemName])
                 else
-                    resolve([data[this.itemName]])
+                    resolve([data[this.jsonItemName]])
             })
         })
     }
