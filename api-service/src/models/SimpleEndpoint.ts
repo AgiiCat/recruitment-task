@@ -37,7 +37,12 @@ export default class SimpleEndpoint {
                     })
                     Promise.all(itemsPromises).then(results => {
                         const items: Array<JSON> = []
-                        results.forEach(result => items.push(JSON.parse(result)))
+                        results.forEach(result => {
+                            try {
+                                items.push(JSON.parse(result))
+                            } catch (e) {
+                            }
+                        })
                         res.status(200).send({type: this.itemName, items: items})
                     }).catch(err => {
                         console.error(err)
@@ -69,7 +74,7 @@ export default class SimpleEndpoint {
                             if (err) {
                                 res.status(500).send({type: "error"})
                             }
-                            redisClient.setAsync(itemUrl, JSON.stringify(body), 'EX', redisClient.expireTime)
+                            redisClient.setAsync(itemUrl, body, 'EX', redisClient.expireTime)
                             res.status(200).send({type: this.itemName, items: [JSON.parse(body)]})
                         })
                     }
@@ -105,24 +110,27 @@ export default class SimpleEndpoint {
     }
 
     private getItemsUrls(heroId: number) {
+        const prepareResult = (input:string): Array<JSON> => {
+            const data = JSON.parse(input)
+            let resultData: Array<JSON>
+            if (Array.isArray(data[this.jsonItemName]))
+                resultData = data[this.jsonItemName]
+            else
+                resultData = [data[this.jsonItemName]]
+            return resultData
+        }
         return new Promise(async (resolve, reject) => {
             const url = "https://swapi.dev/api/people/" + heroId
             const cacheData = await redisClient.getAsync(url)
             if (cacheData) {
-                resolve(JSON.parse(cacheData))
+                resolve(prepareResult(cacheData))
             } else {
                 request(url, (err, response, body) => {
                     if (err) {
                         reject(err)
                     }
-                    const data = JSON.parse(body)
-                    let resultData: Array<JSON>
-                    if (Array.isArray(data[this.jsonItemName]))
-                        resultData = data[this.jsonItemName]
-                    else
-                        resultData = [data[this.jsonItemName]]
-                    redisClient.setAsync(url, JSON.stringify(resultData), 'EX', redisClient.expireTime)
-                    resolve(resultData)
+                    redisClient.setAsync(url, body, 'EX', redisClient.expireTime)
+                    resolve(prepareResult(body))
                 })
             }
         })
