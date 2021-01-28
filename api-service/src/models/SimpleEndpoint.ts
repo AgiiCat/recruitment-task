@@ -1,6 +1,8 @@
 import {Connection} from "mysql2";
 import request from "request";
 
+const redisClient = require('../redis-client')
+
 export default class SimpleEndpoint {
     private connection: Connection
     private readonly itemName: string
@@ -9,7 +11,7 @@ export default class SimpleEndpoint {
     constructor(connection: Connection, itemName: string, jsonItemName?: string) {
         this.connection = connection
         this.itemName = itemName
-        this.jsonItemName = jsonItemName?jsonItemName:itemName
+        this.jsonItemName = jsonItemName ? jsonItemName : itemName
     }
 
     public getAll(email: string, req, res) {
@@ -18,13 +20,19 @@ export default class SimpleEndpoint {
                 this.getItemsUrls(heroId).then((items: Array<string>) => {
                     const itemsPromises = []
                     items.forEach(item => {
-                        itemsPromises.push(new Promise((resolve, reject) => {
-                            request(item, (err, response, body) => {
-                                if (err) {
-                                    reject(err)
-                                }
-                                resolve(body)
-                            })
+                        itemsPromises.push(new Promise(async (resolve, reject) => {
+                            const cacheData = await redisClient.getAsync(item)
+                            if (cacheData) {
+                                resolve(JSON.parse(cacheData))
+                            } else {
+                                request(item, (err, response, body) => {
+                                    if (err) {
+                                        reject(err)
+                                    }
+                                    redisClient.setAsync(item, JSON.stringify(body), 'EX', redisClient.expireTime)
+                                    resolve(body)
+                                })
+                            }
                         }))
                     })
                     Promise.all(itemsPromises).then(results => {
@@ -48,17 +56,23 @@ export default class SimpleEndpoint {
     public getItemById(email: string, itemId: number, req, res) {
         this.getHeroId(email).then(
             (heroId: number) => {
-                this.getItemsUrls(heroId).then((items: Array<string>) => {
+                this.getItemsUrls(heroId).then(async (items: Array<string>) => {
                     const regex = new RegExp(`${this.itemName}\\/${itemId}\\/$`)
                     const itemUrl: String = items.filter(item => regex.test(item)).join();
                     if (itemUrl === "")
                         return res.status(403).send({type: "error", message: "You dont have permissions"});
-                    request(itemUrl, (err, response, body) => {
-                        if (err) {
-                            res.status(500).send({type: "error"})
-                        }
-                        res.status(200).send({type: this.itemName, items: [JSON.parse(body)]})
-                    })
+                    const cacheData = await redisClient.getAsync(itemUrl)
+                    if (cacheData) {
+                        res.status(200).send({type: this.itemName, items: [JSON.parse(cacheData)]})
+                    } else {
+                        request(itemUrl, (err, response, body) => {
+                            if (err) {
+                                res.status(500).send({type: "error"})
+                            }
+                            redisClient.setAsync(itemUrl, JSON.stringify(body), 'EX', redisClient.expireTime)
+                            res.status(200).send({type: this.itemName, items: [JSON.parse(body)]})
+                        })
+                    }
                 }).catch(err => {
                     console.error(err)
                     res.status(500).send({type: "error"})
@@ -91,17 +105,26 @@ export default class SimpleEndpoint {
     }
 
     private getItemsUrls(heroId: number) {
-        return new Promise((resolve, reject) => {
-            request("https://swapi.dev/api/people/" + heroId, (err, response, body) => {
-                if (err) {
-                    reject(err)
-                }
-                const data = JSON.parse(body)
-                if (Array.isArray(data[this.jsonItemName]))
-                    resolve(data[this.jsonItemName])
-                else
-                    resolve([data[this.jsonItemName]])
-            })
+        return new Promise(async (resolve, reject) => {
+            const url = "https://swapi.dev/api/people/" + heroId
+            const cacheData = await redisClient.getAsync(url)
+            if (cacheData) {
+                resolve(JSON.parse(cacheData))
+            } else {
+                request(url, (err, response, body) => {
+                    if (err) {
+                        reject(err)
+                    }
+                    const data = JSON.parse(body)
+                    let resultData: Array<JSON>
+                    if (Array.isArray(data[this.jsonItemName]))
+                        resultData = data[this.jsonItemName]
+                    else
+                        resultData = [data[this.jsonItemName]]
+                    redisClient.setAsync(url, JSON.stringify(resultData), 'EX', redisClient.expireTime)
+                    resolve(resultData)
+                })
+            }
         })
     }
 

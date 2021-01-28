@@ -1,13 +1,23 @@
 version: '2'
 services:
-  test-api:
+  recruitment-api:
     image: "node:latest"
+    container_name: node
     user: "node"
     working_dir: /app/api
     environment:
       - NODE_ENV=development
       - DATABASE_HOST=db
       - JWT_SECRET=hCfz3jtFrHnyjnD43jfgzaVh8jyk4Tfz
+      - REDIS_URL=redis://cache
+      - CACHE_EXPIRE_TIME=86400
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    links:
+      - redis
     volumes:
       - ./api-service:/app/api
     ports:
@@ -15,6 +25,7 @@ services:
     command: "npm start"
   db:
     image: "mysqldb:latest"
+    container_name: mysql
     build: ./db-service
     environment:
       - MYSQL_ROOT_PASSWORD=or9kwNmaMG7BdrWJ
@@ -23,3 +34,10 @@ services:
       - MYSQL_PASSWORD=GVHpp9hZ6DS2EpBs
     ports:
       - "3306:3306"
+    healthcheck:
+      test: "exit 0"
+  redis:
+    image: redis
+    container_name: cache
+    expose:
+      - 6379
