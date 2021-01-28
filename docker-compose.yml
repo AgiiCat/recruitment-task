@@ -1,0 +1,24 @@
+version: '2'
+services:
+  test-api:
+    image: "node:latest"
+    user: "node"
+    working_dir: /app/api
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=db
+    volumes:
+      - ./api-service:/app/api
+    ports:
+      - "8080:8080"
+    command: "npm start"
+  db:
+    image: "mysqldb:latest"
+    build: ./db-service
+    environment:
+      - MYSQL_ROOT_PASSWORD=or9kwNmaMG7BdrWJ
+      - MYSQL_DATABASE=SWAPI
+      - MYSQL_USER=api_service
+      - MYSQL_PASSWORD=GVHpp9hZ6DS2EpBs
+    ports:
+      - "3306:3306"
