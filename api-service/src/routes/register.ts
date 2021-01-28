@@ -2,11 +2,18 @@ import bcrypt from "bcryptjs";
 import DataBaseHandler from '../models/DataBaseHandler'
 import {Connection} from "mysql2";
 import jwt from "jsonwebtoken";
+import request from "request";
 
 const {validateEmail, validatePasswordRequirements} = require("../tools.js")
 const express = require('express').Router({mergeParams: true})
 const app = module.exports = express
 const connection: Connection = DataBaseHandler.getConnection()
+
+interface registerResponse {
+    token: String,
+    hero: JSON,
+    heroId: number
+}
 
 app.post('/', (req, res) => {
     if (req.body === undefined || req.body.email === undefined || req.body.password === undefined)
@@ -22,10 +29,11 @@ app.post('/', (req, res) => {
                 res.status(400).send({type: "error", message: "Email busy"})
             else
                 createNewUser(email, hashedPassword)
-                    .then(token => res.status(200).send({type: "auth", token: token})).catch(err => {
-                    console.error(err)
-                    res.status(500).send({type: "error"})
-                })
+                    .then((result: registerResponse) => res.status(200).send({type: "auth", token: result.token, hero: result.hero, heroId: result.heroId}))
+                    .catch(err => {
+                        console.error(err)
+                        res.status(500).send({type: "error"})
+                    })
         }).catch(err => {
         console.error(err)
         res.status(500).send({type: "error"})
@@ -52,16 +60,50 @@ function checkUniqueEmail(email: String) {
 }
 
 function createNewUser(email: String, hashedPassword: String) {
-    return new Promise((resolve, reject) => {
+    let newUserPromise = new Promise((resolve, reject) => {
         connection.query(`INSERT INTO Users (Email, Pass)
                           VALUES (?, ?)`, [email, hashedPassword], function (err, result) {
                 if (err) {
                     reject(err)
+                } else if ("insertId" in result) {
+                    resolve(result.insertId)
                 } else {
-                    const token = jwt.sign({id: email}, process.env.JWT_SECRET, {
-                        expiresIn: 24 * 60 * 60 // expires in 24 hours
-                    });
-                    resolve(token)
+                    reject("No insertId")
+                }
+            }
+        )
+    })
+    const heroId = Math.floor(Math.random() * 83) + 1;
+    let heroPromise = new Promise((resolve, reject) => {
+        request("https://swapi.dev/api/people/" + heroId, (err, response, body) => {
+            if (err) {
+                reject(err)
+            }
+            resolve(body)
+        })
+    })
+    return new Promise((resolve, reject) => {
+        Promise.all([newUserPromise, heroPromise]).then(async function (results) {
+            const userId = <number>results[0]
+            const heroObject: JSON = JSON.parse(<string>results[1])
+            const token = jwt.sign({id: email}, process.env.JWT_SECRET, {
+                expiresIn: 24 * 60 * 60 // expires in 24 hours
+            });
+            await assignHero(userId, heroId, token, heroObject)
+            const registerResponse: registerResponse = {token: token, hero: heroObject, heroId: heroId}
+            resolve(registerResponse)
+        }).catch(err => reject(err))
+    })
+}
+
+function assignHero(userId: Number, heroId: Number, token: String, hero: JSON) {
+    return new Promise((resolve, reject) => {
+        connection.query(`INSERT INTO HeroAssignments (UserId, HeroId)
+                          VALUES (?, ?)`, [userId, heroId], function (err, result) {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(0)
                 }
             }
         )
