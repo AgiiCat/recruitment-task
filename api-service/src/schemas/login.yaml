@@ -1,0 +1,42 @@
+paths:
+  /login/:
+    post:
+      tags:
+        - Auth
+      summary: Loging user.
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Credentials
+          description: Email and password required to sign in.
+          required: true
+          schema:
+            $ref: '#/definitions/Credentials'
+      responses:
+        200:
+          description: Correctly signed in
+          examples:
+            application/json: |
+              {
+                  "auth": true,
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyMkB0ZXN0LnBsIiwiaWF0IjoxNjExODc4OTUyLCJleHAiOjE2MTE5NjUzNTJ9.uLwYI8UY2AW0_Y1KDVDrAyQ7HHFeGOICOz1qxAB-89I"
+              }
+        400:
+          description: Missing credentials.
+          examples:
+            application/json: |
+              {
+                "type": "error",
+                "message": "Missing data"
+              }
+        401:
+          description: Wrong email or/and password.
+          examples:
+            application/json: |
+              {
+                "type": "error",
+                "message": "Email/Password is invalid"
+              }
+        500:
+          description: Internal server error

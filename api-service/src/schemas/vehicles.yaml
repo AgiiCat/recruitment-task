@@ -1,0 +1,115 @@
+paths:
+  /vehicles/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a list of vehicles.
+      description: Retrieve a list of vehicles from SWApi. This list is reduced to vehicles assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A list of assigned vehicles
+          examples:
+            application/json: |
+              {
+                "type": "vehicles",
+                "items": [
+                  {
+                    "name": "Snowspeeder",
+                    "model": "t-47 airspeeder",
+                    "manufacturer": "Incom corporation",
+                    "cost_in_credits": "unknown",
+                    "length": "4.5",
+                    "max_atmosphering_speed": "650",
+                    "crew": "2",
+                    "passengers": "0",
+                    "cargo_capacity": "10",
+                    "consumables": "none",
+                    "vehicle_class": "airspeeder",
+                    "pilots": [
+                      "http://swapi.dev/api/people/1/",
+                      "http://swapi.dev/api/people/18/"
+                    ],
+                    "films": [
+                      "http://swapi.dev/api/films/2/"
+                    ],
+                    "created": "2014-12-15T12:22:12Z",
+                    "edited": "2014-12-20T21:30:21.672000Z",
+                    "url": "http://swapi.dev/api/vehicles/14/"
+                  }
+                ]
+              }
+        500:
+          description: Internal server error
+  /vehicles/{vehicleId}/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a vehicle with vehicleId.
+      description: Retrieve a vehicle with vehicleId from SWApi. It will show only vehicle assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: vehicleId
+          description: Id of requested vehicle
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: A list of assigned vehicles
+          examples:
+            application/json: |
+              {
+                "type": "vehicles",
+                "items": [
+                  {
+                    "name": "Snowspeeder",
+                    "model": "t-47 airspeeder",
+                    "manufacturer": "Incom corporation",
+                    "cost_in_credits": "unknown",
+                    "length": "4.5",
+                    "max_atmosphering_speed": "650",
+                    "crew": "2",
+                    "passengers": "0",
+                    "cargo_capacity": "10",
+                    "consumables": "none",
+                    "vehicle_class": "airspeeder",
+                    "pilots": [
+                      "http://swapi.dev/api/people/1/",
+                      "http://swapi.dev/api/people/18/"
+                    ],
+                    "films": [
+                      "http://swapi.dev/api/films/2/"
+                    ],
+                    "created": "2014-12-15T12:22:12Z",
+                    "edited": "2014-12-20T21:30:21.672000Z",
+                    "url": "http://swapi.dev/api/vehicles/14/"
+                  }
+                ]
+              }
+        403:
+          desctiption: Vehicle is not assigned to user's hero
+          examples:
+            application/json: |
+              {
+                "type": "error",
+                "message": "You dont have permissions"
+              }
+        500:
+          description: Internal server error

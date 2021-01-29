@@ -1,0 +1,75 @@
+paths:
+  /register/:
+    post:
+      tags:
+        - Auth
+      summary: Registering user and assigning hero.
+      description: Registering user and assigning hero from SWApi. Hero is chosen randomly.
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: Credentials
+          description: Email and password required to sign up.
+          required: true
+          schema:
+            $ref: '#/definitions/Credentials'
+      responses:
+        200:
+          description: Correctly signed up
+          examples:
+            application/json: |
+              {
+                "type": "auth",
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InRlc3QyM0B0ZXN0LnBsIiwiaWF0IjoxNjExODc3NDM0LCJleHAiOjE2MTE5NjM4MzR9.xAT23lsI9WcgWvjsS0xHqCEvkzAnO3XbHfxP0Jma3H8",
+                "hero": {
+                  "name": "Wedge Antilles",
+                  "height": "170",
+                  "mass": "77",
+                  "hair_color": "brown",
+                  "skin_color": "fair",
+                  "eye_color": "hazel",
+                  "birth_year": "21BBY",
+                  "gender": "male",
+                  "homeworld": "http://swapi.dev/api/planets/22/",
+                  "films": [
+                    "http://swapi.dev/api/films/1/",
+                    "http://swapi.dev/api/films/2/",
+                    "http://swapi.dev/api/films/3/"
+                  ],
+                  "species": [],
+                  "vehicles": [
+                    "http://swapi.dev/api/vehicles/14/"
+                  ],
+                  "starships": [
+                    "http://swapi.dev/api/starships/12/"
+                  ],
+                  "created": "2014-12-12T11:08:06.469000Z",
+                  "edited": "2014-12-20T21:17:50.341000Z",
+                  "url": "http://swapi.dev/api/people/18/"
+                },
+                "heroId": 18
+              }
+        400:
+          description: Wrong credentials.
+          examples:
+            application/json: |
+              {
+                "type": "error",
+                "message": "Invalid data"
+              }
+        500:
+          description: Internal server error
+definitions:
+  Credentials:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        description: Email must be correct. It will be verified by regular expressions.
+        type: string
+      password:
+        description: Password must have between 8 and 20 characters. Must contain at least one uppercase letter, one lowercase letter and one number.
+        type: string

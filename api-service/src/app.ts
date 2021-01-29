@@ -1,6 +1,7 @@
 import express from 'express'
-
 import bodyParser from "body-parser";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 
 const app = express()
 const port = 8080
@@ -24,6 +25,19 @@ app.use("/species", require('./routes/species'))
 app.use("/vehicles", require('./routes/vehicles'))
 app.use("/starships", require('./routes/starships'))
 app.use("/planets", require('./routes/planets'))
+
+const swaggerOptions = {
+    swaggerDefinition: {
+        info: {
+            title: 'SWApi with auth',
+            version: '1.0.0',
+        },
+    },
+    apis: ['src/schemas/*.yaml'],
+};
+const specs = swaggerJsdoc(swaggerOptions)
+if(process.env.NODE_ENV === "development")
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs))
 
 app.listen(port, () => console.log(`Server is listening on ${port}`))
 

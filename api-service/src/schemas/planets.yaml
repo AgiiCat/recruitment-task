@@ -1,0 +1,105 @@
+paths:
+  /planets/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a list of planets.
+      description: Retrieve a list of planets from SWApi. This list is reduced to planets assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A list of assigned planets
+          examples:
+            application/json: |
+              {
+                "type": "planets",
+                "items": [
+                  {
+                    "name": "Glee Anselm",
+                    "rotation_period": "33",
+                    "orbital_period": "206",
+                    "diameter": "15600",
+                    "climate": "tropical, temperate",
+                    "gravity": "1",
+                    "terrain": "lakes, islands, swamps, seas",
+                    "surface_water": "80",
+                    "population": "500000000",
+                    "residents": [
+                      "http://swapi.dev/api/people/53/"
+                    ],
+                    "films": [],
+                    "created": "2014-12-20T10:18:26.110000Z",
+                    "edited": "2014-12-20T20:58:18.495000Z",
+                    "url": "http://swapi.dev/api/planets/44/"
+                  }
+                ]
+              }
+        500:
+          description: Internal server error
+  /planets/{planetId}/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a planet with planetId.
+      description: Retrieve a planet with planetId from SWApi. It will show only planet assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: planetId
+          description: Id of requested planet
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: A list of assigned planets
+          examples:
+            application/json: |
+              {
+                "type": "planets",
+                "items": [
+                  {
+                    "name": "Glee Anselm",
+                    "rotation_period": "33",
+                    "orbital_period": "206",
+                    "diameter": "15600",
+                    "climate": "tropical, temperate",
+                    "gravity": "1",
+                    "terrain": "lakes, islands, swamps, seas",
+                    "surface_water": "80",
+                    "population": "500000000",
+                    "residents": [
+                      "http://swapi.dev/api/people/53/"
+                    ],
+                    "films": [],
+                    "created": "2014-12-20T10:18:26.110000Z",
+                    "edited": "2014-12-20T20:58:18.495000Z",
+                    "url": "http://swapi.dev/api/planets/44/"
+                  }
+                ]
+              }
+        403:
+          desctiption: Planet is not assigned to user's hero
+          examples:
+            application/json: |
+              {
+                "type": "error",
+                "message": "You dont have permissions"
+              }
+        500:
+          description: Internal server error

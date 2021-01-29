@@ -1,0 +1,175 @@
+paths:
+  /films/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a list of films.
+      description: Retrieve a list of films from SWApi. This list is reduced to films assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A list of assigned films
+          examples:
+            application/json: |
+              {
+                "type": "films",
+                "items": [
+                  {
+                    "title": "The Phantom Menace",
+                    "episode_id": 1,
+                    "opening_crawl": "Turmoil has engulfed the\r\nGalactic Republic. The taxation\r\nof trade routes to outlying star\r\nsystems is in dispute.\r\n\r\nHoping to resolve the matter\r\nwith a blockade of deadly\r\nbattleships, the greedy Trade\r\nFederation has stopped all\r\nshipping to the small planet\r\nof Naboo.\r\n\r\nWhile the Congress of the\r\nRepublic endlessly debates\r\nthis alarming chain of events,\r\nthe Supreme Chancellor has\r\nsecretly dispatched two Jedi\r\nKnights, the guardians of\r\npeace and justice in the\r\ngalaxy, to settle the conflict....",
+                    "director": "George Lucas",
+                    "producer": "Rick McCallum",
+                    "release_date": "1999-05-19",
+                    "characters": [
+                      "http://swapi.dev/api/people/2/",
+                      "http://swapi.dev/api/people/3/",
+                      "http://swapi.dev/api/people/10/"
+                    ],
+                    "planets": [
+                      "http://swapi.dev/api/planets/1/",
+                      "http://swapi.dev/api/planets/8/",
+                      "http://swapi.dev/api/planets/9/"
+                    ],
+                    "starships": [
+                      "http://swapi.dev/api/starships/31/",
+                      "http://swapi.dev/api/starships/32/",
+                      "http://swapi.dev/api/starships/41/"
+                    ],
+                    "vehicles": [
+                      "http://swapi.dev/api/vehicles/33/",
+                      "http://swapi.dev/api/vehicles/34/",
+                      "http://swapi.dev/api/vehicles/42/"
+                    ],
+                    "species": [
+                      "http://swapi.dev/api/species/1/",
+                      "http://swapi.dev/api/species/2/"
+                    ],
+                    "created": "2014-12-19T16:52:55.740000Z",
+                    "edited": "2014-12-20T10:54:07.216000Z",
+                    "url": "http://swapi.dev/api/films/4/"
+                  },
+                  {
+                    "title": "Attack of the Clones",
+                    "episode_id": 2,
+                    "opening_crawl": "There is unrest in the Galactic\r\nSenate. Several thousand solar\r\nsystems have declared their\r\nintentions to leave the Republic.\r\n\r\nThis separatist movement,\r\nunder the leadership of the\r\nmysterious Count Dooku, has\r\nmade it difficult for the limited\r\nnumber of Jedi Knights to maintain \r\npeace and order in the galaxy.\r\n\r\nSenator Amidala, the former\r\nQueen of Naboo, is returning\r\nto the Galactic Senate to vote\r\non the critical issue of creating\r\nan ARMY OF THE REPUBLIC\r\nto assist the overwhelmed\r\nJedi....",
+                    "director": "George Lucas",
+                    "producer": "Rick McCallum",
+                    "release_date": "2002-05-16",
+                    "characters": [
+                      "http://swapi.dev/api/people/2/",
+                      "http://swapi.dev/api/people/3/",
+                      "http://swapi.dev/api/people/6/",
+                      "http://swapi.dev/api/people/7/"
+                    ],
+                    "planets": [
+                      "http://swapi.dev/api/planets/1/",
+                      "http://swapi.dev/api/planets/11/"
+                    ],
+                    "starships": [
+                      "http://swapi.dev/api/starships/21/",
+                      "http://swapi.dev/api/starships/32/",
+                      "http://swapi.dev/api/starships/58/"
+                    ],
+                    "vehicles": [
+                      "http://swapi.dev/api/vehicles/4/",
+                      "http://swapi.dev/api/vehicles/44/"
+                    ],
+                    "species": [
+                      "http://swapi.dev/api/species/1/",
+                      "http://swapi.dev/api/species/2/",
+                      "http://swapi.dev/api/species/6/",
+                      "http://swapi.dev/api/species/35/"
+                    ],
+                    "created": "2014-12-20T10:57:57.886000Z",
+                    "edited": "2014-12-20T20:18:48.516000Z",
+                    "url": "http://swapi.dev/api/films/5/"
+                  }
+                ]
+              }
+        500:
+          description: Internal server error
+  /films/{filmId}/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a film with filmId.
+      description: Retrieve a film with filmId from SWApi. It will show only film assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: filmId
+          description: Id of requested film
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: A list of assigned films
+          examples:
+            application/json: |
+              {
+                "type": "films",
+                "items": [
+                  {
+                    "title": "The Phantom Menace",
+                    "episode_id": 1,
+                    "opening_crawl": "Turmoil has engulfed the\r\nGalactic Republic. The taxation\r\nof trade routes to outlying star\r\nsystems is in dispute.\r\n\r\nHoping to resolve the matter\r\nwith a blockade of deadly\r\nbattleships, the greedy Trade\r\nFederation has stopped all\r\nshipping to the small planet\r\nof Naboo.\r\n\r\nWhile the Congress of the\r\nRepublic endlessly debates\r\nthis alarming chain of events,\r\nthe Supreme Chancellor has\r\nsecretly dispatched two Jedi\r\nKnights, the guardians of\r\npeace and justice in the\r\ngalaxy, to settle the conflict....",
+                    "director": "George Lucas",
+                    "producer": "Rick McCallum",
+                    "release_date": "1999-05-19",
+                    "characters": [
+                      "http://swapi.dev/api/people/2/",
+                      "http://swapi.dev/api/people/3/",
+                      "http://swapi.dev/api/people/10/"
+                    ],
+                    "planets": [
+                      "http://swapi.dev/api/planets/1/",
+                      "http://swapi.dev/api/planets/8/",
+                      "http://swapi.dev/api/planets/9/"
+                    ],
+                    "starships": [
+                      "http://swapi.dev/api/starships/31/",
+                      "http://swapi.dev/api/starships/32/",
+                      "http://swapi.dev/api/starships/41/"
+                    ],
+                    "vehicles": [
+                      "http://swapi.dev/api/vehicles/33/",
+                      "http://swapi.dev/api/vehicles/34/",
+                      "http://swapi.dev/api/vehicles/42/"
+                    ],
+                    "species": [
+                      "http://swapi.dev/api/species/1/",
+                      "http://swapi.dev/api/species/2/"
+                    ],
+                    "created": "2014-12-19T16:52:55.740000Z",
+                    "edited": "2014-12-20T10:54:07.216000Z",
+                    "url": "http://swapi.dev/api/films/4/"
+                  }
+                ]
+              }
+        403:
+          desctiption: Film is not assigned to user's hero
+          examples:
+            application/json: |
+              {
+                "type": "error",
+                "message": "You dont have permissions"
+              }
+        500:
+          description: Internal server error

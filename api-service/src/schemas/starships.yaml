@@ -1,0 +1,127 @@
+paths:
+  /starships/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a list of starships.
+      description: Retrieve a list of starships from SWApi. This list is reduced to starships assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A list of assigned starships
+          examples:
+            application/json: |
+              {
+                "type": "starships",
+                "items": [
+                  {
+                    "name": "X-wing",
+                    "model": "T-65 X-wing",
+                    "manufacturer": "Incom Corporation",
+                    "cost_in_credits": "149999",
+                    "length": "12.5",
+                    "max_atmosphering_speed": "1050",
+                    "crew": "1",
+                    "passengers": "0",
+                    "cargo_capacity": "110",
+                    "consumables": "1 week",
+                    "hyperdrive_rating": "1.0",
+                    "MGLT": "100",
+                    "starship_class": "Starfighter",
+                    "pilots": [
+                      "http://swapi.dev/api/people/1/",
+                      "http://swapi.dev/api/people/9/",
+                      "http://swapi.dev/api/people/18/",
+                      "http://swapi.dev/api/people/19/"
+                    ],
+                    "films": [
+                      "http://swapi.dev/api/films/1/",
+                      "http://swapi.dev/api/films/2/",
+                      "http://swapi.dev/api/films/3/"
+                    ],
+                    "created": "2014-12-12T11:19:05.340000Z",
+                    "edited": "2014-12-20T21:23:49.886000Z",
+                    "url": "http://swapi.dev/api/starships/12/"
+                  }
+                ]
+              }
+        500:
+          description: Internal server error
+  /starships/{starshipId}/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a starship with starshipId.
+      description: Retrieve a starship with starshipId from SWApi. It will show only starship assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: starshipId
+          description: Id of requested starship
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: A list of assigned starships
+          examples:
+            application/json: |
+              {
+                "type": "starships",
+                "items": [
+                  {
+                    "name": "X-wing",
+                    "model": "T-65 X-wing",
+                    "manufacturer": "Incom Corporation",
+                    "cost_in_credits": "149999",
+                    "length": "12.5",
+                    "max_atmosphering_speed": "1050",
+                    "crew": "1",
+                    "passengers": "0",
+                    "cargo_capacity": "110",
+                    "consumables": "1 week",
+                    "hyperdrive_rating": "1.0",
+                    "MGLT": "100",
+                    "starship_class": "Starfighter",
+                    "pilots": [
+                      "http://swapi.dev/api/people/1/",
+                      "http://swapi.dev/api/people/9/",
+                      "http://swapi.dev/api/people/18/",
+                      "http://swapi.dev/api/people/19/"
+                    ],
+                    "films": [
+                      "http://swapi.dev/api/films/1/",
+                      "http://swapi.dev/api/films/2/",
+                      "http://swapi.dev/api/films/3/"
+                    ],
+                    "created": "2014-12-12T11:19:05.340000Z",
+                    "edited": "2014-12-20T21:23:49.886000Z",
+                    "url": "http://swapi.dev/api/starships/12/"
+                  }
+                ]
+              }
+        403:
+          desctiption: Starship is not assigned to user's hero
+          examples:
+            application/json: |
+              {
+                "type": "error",
+                "message": "You dont have permissions"
+              }
+        500:
+          description: Internal server error

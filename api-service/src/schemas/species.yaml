@@ -1,0 +1,111 @@
+paths:
+  /species/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a list of species.
+      description: Retrieve a list of species from SWApi. This list is reduced to species assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A list of assigned species
+          examples:
+            application/json: |
+              {
+                "type": "species",
+                "items": [
+                  {
+                    "name": "Nautolan",
+                    "classification": "amphibian",
+                    "designation": "sentient",
+                    "average_height": "180",
+                    "skin_colors": "green, blue, brown, red",
+                    "hair_colors": "none",
+                    "eye_colors": "black",
+                    "average_lifespan": "70",
+                    "homeworld": "http://swapi.dev/api/planets/44/",
+                    "language": "Nautila",
+                    "people": [
+                      "http://swapi.dev/api/people/53/"
+                    ],
+                    "films": [
+                      "http://swapi.dev/api/films/4/"
+                    ],
+                    "created": "2014-12-20T10:18:58.610000Z",
+                    "edited": "2014-12-20T21:36:42.181000Z",
+                    "url": "http://swapi.dev/api/species/21/"
+                  }
+                ]
+              }
+        500:
+          description: Internal server error
+  /species/{speciesId}/:
+    get:
+      tags:
+        - Items
+      summary: Retrieve a species with speciesId.
+      description: Retrieve a species with speciesId from SWApi. It will show only species assigned to user's hero authorized with JsonWebToken
+      produces:
+        - application/json
+      parameters:
+        - in: header
+          name: x-access-token
+          description: Token from JWT to authorize access
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: speciesId
+          description: Id of requested species
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: A list of assigned species
+          examples:
+            application/json: |
+              {
+                "type": "species",
+                "items": [
+                  {
+                    "name": "Nautolan",
+                    "classification": "amphibian",
+                    "designation": "sentient",
+                    "average_height": "180",
+                    "skin_colors": "green, blue, brown, red",
+                    "hair_colors": "none",
+                    "eye_colors": "black",
+                    "average_lifespan": "70",
+                    "homeworld": "http://swapi.dev/api/planets/44/",
+                    "language": "Nautila",
+                    "people": [
+                      "http://swapi.dev/api/people/53/"
+                    ],
+                    "films": [
+                      "http://swapi.dev/api/films/4/"
+                    ],
+                    "created": "2014-12-20T10:18:58.610000Z",
+                    "edited": "2014-12-20T21:36:42.181000Z",
+                    "url": "http://swapi.dev/api/species/21/"
+                  }
+                ]
+              }
+        403:
+          desctiption: species is not assigned to user's hero
+          examples:
+            application/json: |
+              {
+                "type": "error",
+                "message": "You dont have permissions"
+              }
+        500:
+          description: Internal server error
